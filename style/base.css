@@ -1,0 +1,50 @@
+/*base css*/
+*{
+	padding: 0;
+	margin: 0;
+	outline: 0;
+}
+
+
+
+
+
+/*base frame*/
+
+body{
+	background: #ECEFF5;
+	overflow: hidden;	
+}
+
+#top{
+	background: #005EA3;
+	height: 10px;
+	position: fixed;
+	top: 0px;
+	width: 100%;
+}
+
+#bottom{
+	background: #005EA3;
+	height: 10px;
+	position: fixed;
+	bottom: 0px;
+	width: 100%; 
+}
+
+
+#items{
+	position: absolute;
+}
+/*item*/
+
+.i_item{
+	width: 900px;
+	height: 500px;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-top: -252px;
+	margin-left: -452px;
+	border:4px solid #005EA3;
+}
