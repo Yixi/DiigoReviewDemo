@@ -13,15 +13,21 @@ var Review  = function  () {
 	var t = this;
 	this.element = $(args[0]);
 	this.dataurl = args[1];
-	this.h = document.height-20;
-	this.w = document.width;
+	this.h = window.innerHeight-20;
+	this.w = window.innerWidth;
 
 
 	this.init = function(){
 		// console.log(1);
 		$.get('js/data.json',function(data){
 			t.data = data;
-			t.BuildUI();	
+
+			$.get('TestDesign.html',function(html){
+				t.testdata = html;
+				t.BuildUI();
+			});
+
+				
 		});
 	};
 
@@ -29,7 +35,7 @@ var Review  = function  () {
 		var data = t.data.data;
 		for(i=0;i<data.length;i++){
 			t.element.append('<div id="item_'+i+'" class="item" style="height:'+t.h+'px;width:'+t.w+'px;margin-top:0px;margin-left:'+i*t.w+'px;overflow:hidden;position:absolute;"></div>');
-			$("#item_"+i).append('<div id="i_'+i+'" class="i_item">'+data[i].title+i+'</div>');
+			$("#item_"+i).append('<div id="i_'+i+'" class="i_item">'+t.testdata+'</div>');
 		};
 		t.bindUI();
 	}
@@ -41,18 +47,38 @@ var Review  = function  () {
 			switch(code){
 				case 39:
 					//next
-					if (!$("body").is(':animated'))
-					$("body").animate({scrollLeft:document.body.scrollLeft+t.w});
+					t.scrollRight();
 					break;
 				case 37:
 					//prev
-					if (!$("body").is(':animated'))
-					$("body").animate({scrollLeft:document.body.scrollLeft-t.w});
+					t.scrollLeft();
 					break;
+			}
+		});
+
+		$("#prev_b").click(function(e){t.scrollLeft();})
+		$("#next_b").click(function(e){t.scrollRight();})
+		$(window).bind("resize",function(e){
+			var w =t.w;
+			var l = document.body.scrollLeft;
+			t.h=window.innerHeight-20;
+			t.w=window.innerWidth;
+			for(i=0;i<$('.item').length;i++){
+				$($('.item')[i]).attr('style','height:'+t.h+'px;width:'+t.w+'px;margin-top:0px;margin-left:'+i*t.w+'px;overflow:hidden;position:absolute;')
+				document.body.scrollLeft = t.w*l/w
 			}
 		});
 	}
 
+	this.scrollLeft = function(){
+		if (!$("body").is(':animated'))
+		$("body").animate({scrollLeft:document.body.scrollLeft-t.w});
+	}
+
+	this.scrollRight = function(){
+		if (!$("body").is(':animated'))
+		$("body").animate({scrollLeft:document.body.scrollLeft+t.w});
+	}
 
 }
 
