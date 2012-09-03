@@ -1,5 +1,5 @@
 /**
- * Diigo Review lib v 0.1 
+ * Diigo Review lib v 0.2 
  *
  * Copyright (c) 2012 Diigo, Inc. (diigo.com)
  * Powered by jQuery (jquery.com)
