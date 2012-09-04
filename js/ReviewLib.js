@@ -12,13 +12,13 @@ var ReviewLib = function() {
 
 		var z = this;
 		this.element = $(args[0])
-
+		this.offset = 0;
 		this.h = window.innerHeight - 20;
 		this.w = window.innerWidth;
 
 		this.init = function(url) {
 			$.get(url, function(data) {
-				t.BuildUI(data.data, "right");
+				z.BuildUI(data.data, "right");
 			});
 		}
 
@@ -76,10 +76,15 @@ var ReviewLib = function() {
 		};
 
 		this.scrollLeft = function() {
-			
+			z.offset--;
+			if (!$("body").is(':animated'))
+			$("body").animate({scrollLeft:document.body.scrollLeft-t.w});
+
 		}
 		this.scrollRight = function() {
-
+			z.offset++;
+			if (!$("body").is(':animated'))
+			$("body").animate({scrollLeft:document.body.scrollLeft+t.w});
 		}
 
 	}
@@ -88,5 +93,8 @@ var ReviewLib = function() {
 
 $(function() {
 
+	var a = new ReviewLib("#items");
+	console.log(a);
+	a.init();
 
 });
