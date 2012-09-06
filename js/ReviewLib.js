@@ -134,8 +134,8 @@ var ReviewLib = function() {
 
 				 		// z.element.trigger('reviewlibdata',["left",a.element.children().first().attr('data-offset')]);
 
-				 		var data = z.LoadItems(z.element.children().first().attr('data-offset'),"left");
-				 		z.BuildUI(data,'left');
+				 		z.LoadItems(z.element.children().first().attr('data-offset'),"left",z.BuildUI);
+
 				 	}
 				});
 				
@@ -160,15 +160,15 @@ var ReviewLib = function() {
 					if(z.r_offset-z.point==3 || z.point==z.r_offset-1){
 					
 						// z.element.trigger('reviewlibdata',["right",a.element.children().last().attr('data-offset')]);
-						var data = z.LoadItems(z.element.children().last().attr('data-offset'),"right");
-						z.BuildUI(data,'right');
+						z.LoadItems(z.element.children().last().attr('data-offset'),"right",z.BuildUI);
+						// z.BuildUI(data,'right');
 					}
 				});
 				
 			}
 		};
 
-		this.LoadItems = function(offset,direction){};
+		this.LoadItems = function(offset,direction,callback){};
 
 		// z.init(z.initdata);
 
@@ -193,26 +193,26 @@ $(function() {
 
 		a = new ReviewLib("#items");
 		a.init(testdata);
-		a.LoadItems = function(offset,direction){
-			var tdata;
+		a.LoadItems = function(offset,direction,callback){
 			$.ajax({
 				url:'TestDesign.html',
-				async:false,
 				success:function(data){
 					// console.log(data);
-					tdata = data;
+
+					var t = new Array();
+					for(i=0;i<5;i++){
+						var jsondata = {
+							offset:parseInt(100*Math.random()),
+							html:data
+						}
+						t.push(jsondata);
+					}
+
+					callback(t,direction)
 				}
 			});
-			var t = new Array();
-			for(i=0;i<5;i++){
-				var jsondata = {
-					offset:parseInt(100*Math.random()),
-					html:tdata
-				}
-				t.push(jsondata);
-			}
+			
 
-			return t;
 		}
 
 
