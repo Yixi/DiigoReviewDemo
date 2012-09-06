@@ -11,10 +11,13 @@ var ReviewLib = function() {
 		var args = Array.prototype.slice.call(arguments);
 
 		var z = this;
-		this.element = $(args[0])
+		this.element = $(args[0]);
+		this.initdata = args[1];
 		this.point = 0;
 		this.h = window.innerHeight - 20;
 		this.w = window.innerWidth;
+
+		
 
 		this.init = function(initdata) {
 			// console.log(initdata[0]);
@@ -25,28 +28,56 @@ var ReviewLib = function() {
 		this.BuildUI = function(data, location) {
 			switch (location) {
 			case 'right':
-				var lastid;
-				// if(z.element.children.length>0) lastid = z.element.children.last().attr('id');
-				// 	else lastid = "item_0";
-				lastid = z.element.children().length>0?z.element.children().last().attr('id'):"item_-1";
 
+				var lastid = z.element.children().length>0?z.element.children().last().attr('id'):"item_-1";
 				z.r_offset = parseInt(lastid.slice(5,lastid.length));
 				z.r_offset++;
 				for (i = z.r_offset; i < (z.r_offset + data.length); i++) {
 					// console.log(i-z.r_offset);
-					z.element.append('<div id="item_' + i + '" class="item" style="height:' + z.h + 'px;width:' + z.w + 'px;overflow:hidden;float:left;position:relative;"></div>');
-					$("#item_" + i).append('<div id="i_' + i + '" class="i_item">' + data[i-z.r_offset] + '</div>');
-					z.element.css("width",i*z.w);
+					z.element.append('<div id="item_' + i + '" data-offset="'+data[i-z.r_offset].offset+'" class="item" style="height:' + z.h + 'px;width:' + z.w + 'px;overflow:hidden;float:left;position:relative;"></div>');
+					$("#item_" + i).append('<div id="i_' + i + '" class="i_item">' + data[i-z.r_offset].html + '</div>');
+					z.element.css("width",parseInt(a.element.css("width").slice(0,-2))+z.w);
 				}
+
+				if(z.element.children().length>25){
+					for(i=0;i<5;i++){
+						a.element.children().first().remove();
+						z.element.css("width",parseInt(a.element.css("width").slice(0,-2))-z.w);
+						z.element.css("marginLeft",parseInt(z.element.css('marginLeft').slice(0,-2))+z.w);
+					}
+				}
+
+
 				lastid = z.element.children().length>0?z.element.children().last().attr('id'):"item_0";
+				var firstid = z.element.children().length>0?z.element.children().first().attr('id'):"item_0";
 				z.r_offset = parseInt(lastid.slice(5,lastid.length));
+				z.l_offset = parseInt(firstid.slice(5,firstid.length));
 				break;
 			case 'left':
-				for (i = data.length - 1; i >= 0; i--) {
-					z.element.prepend('<div id="item_' +z.l_offset+ '" class="item" style="height:' + z.h + 'px;width:' + z.w + 'px;margin-top:0px;margin-left:' + z.l_offset * z.w + 'px;overflow:hidden;position:absolute;"></div>');
-					$("#item_" + z.l_offset).append('<div id="i_' + z.l_offset + '" class="i_item">' + data[i] + '</div>');
-					z.l_offset--;
+				var firstid = z.element.children().length>0?z.element.children().first().attr('id'):"item_0";
+				z.l_offset = parseInt(firstid.slice(5,firstid.length));
+				z.l_offset--;
+				for (i =z.l_offset; i > z.l_offset - data.length; i--) {
+					z.element.prepend('<div id="item_' +i+ '" data-offset="'+data[data.length-z.l_offset+i-1].offset+'" class="item" style="height:' + z.h + 'px;width:' + z.w + 'px;;overflow:hidden;float:left;position:relative;"></div>');
+					$("#item_" + i).append('<div id="i_' + i + '" class="i_item">' + data[data.length-z.l_offset+i-1].html + '</div>');
+					z.element.css("width",parseInt(a.element.css("width").slice(0,-2))+z.w);
+					z.element.css("marginLeft",parseInt(z.element.css('marginLeft').slice(0,-2))-z.w);
 				}
+
+				if(z.element.children().length>25){
+					for(i=0;i<5;i++){
+						a.element.children().last().remove();
+						z.element.css("width",parseInt(a.element.css("width").slice(0,-2))-z.w);
+						// z.element.css("marginLeft",parseInt(z.element.css('marginLeft').slice(0,-2))+z.w);
+					}
+				}
+
+
+
+				var lastid = z.element.children().length>0?z.element.children().last().attr('id'):"item_0";
+			 	firstid = z.element.children().length>0?z.element.children().first().attr('id'):"item_0";
+				z.r_offset = parseInt(lastid.slice(5,lastid.length));
+				z.l_offset = parseInt(firstid.slice(5,firstid.length));
 				break;
 			};
 			z.BindUI();
@@ -56,7 +87,6 @@ var ReviewLib = function() {
 			var type = $.browser.mozilla ? 'keypress' : 'keydown';
 			$(document).bind(type, function(e) {
 				var code = e.keyCode ? e.keyCode : e.which;
-				console.log(e);
 				switch (code) {
 				case 39:
 					//next
@@ -74,70 +104,73 @@ var ReviewLib = function() {
 				z.scrollLeft();
 			})
 			$("#next_b").click(function(e) {
-				console.log(e);
 				z.scrollRight();
 			})
 			$(window).bind("resize", function(e) {
 				var w = z.w;
-				var l = document.body.scrollLeft;
+				var l = parseInt(z.element.css('marginLeft').slice(0,-2));
 				z.h = window.innerHeight - 20;
 				z.w = window.innerWidth;
 				for (i = 0; i < $('.item').length; i++) {
-					$($('.item')[i]).attr('style', 'height:' + z.h + 'px;width:' + z.w + 'px;margin-top:0px;margin-left:' + i * z.w + 'px;overflow:hidden;position:absolute;')
-					document.body.scrollLeft = z.w * l / w
+					$($('.item')[i]).attr('style', 'height:' + z.h + 'px;width:' + z.w + 'px;overflow:hidden;float:left;position:relative;')
+					z.element.css('marginLeft',z.w * l / w);
 				}
 			});
 
 		};
 
 		this.scrollLeft = function() {
-			var w =z.w;
-			var l = document.body.scrollLeft;
-			var cur = l/w+1;
-
-			if(cur==3 && cur==0){
-				console.log('loadingleft');
-				z.element.trigger('data',["left"]);
-			}
+			
+			if(z.point==z.l_offset){
+				return;
+			}			
 
 
+			if(!z.element.is(":animated")){
+				z.element.animate({marginLeft:parseInt(z.element.css('marginLeft').slice(0,-2))+z.w},function(e){
+					z.point--;
 
-			if (!$("body").is(':animated'))
-			$("body").animate({scrollLeft:document.body.scrollLeft-z.w});
+				 	if(z.point-z.l_offset==2 || z.point==z.l_offset){
 
-		}
-		this.scrollRight = function() {
-			console.log('lodingright');
-			if(z.r_offset-z.point==3 || z.point==z.r_offset-1){
+				 		// z.element.trigger('reviewlibdata',["left",a.element.children().first().attr('data-offset')]);
+
+				 		var data = z.LoadItems(z.element.children().first().attr('data-offset'),"left");
+				 		z.BuildUI(data,'left');
+				 	}
+				});
 				
-				z.element.trigger('data',["right"]);
+
 			}
+
+
+		};
+
+
+		this.scrollRight = function() {
+			
 
 			if(z.point==z.r_offset-1){
 				return;
 			}
 
 			if (!z.element.is(':animated')){
-				z.element.animate({marginLeft:z.element.css('marginLeft').slice(0,-2)-z.w});
-				z.point++;
+				z.element.animate({marginLeft:parseInt(z.element.css('marginLeft').slice(0,-2))-z.w},function(e){
+					z.point++;
+
+					if(z.r_offset-z.point==3 || z.point==z.r_offset-1){
+					
+						// z.element.trigger('reviewlibdata',["right",a.element.children().last().attr('data-offset')]);
+						var data = z.LoadItems(z.element.children().last().attr('data-offset'),"right");
+						z.BuildUI(data,'right');
+					}
+				});
+				
 			}
+		};
 
+		this.LoadItems = function(offset,direction){};
 
-			
-
-
-			// var w = z.w;
-			// var l = Math.abs(z.element.css('marginLeft').slice(0,-2));
-			// var len = z.element.children().length;
-			// var cur = l/w +1;
-
-			// if(cur==3 && cur==0){
-			// 	console.log('lodingright');
-			// 	z.element.trigger('data',["right"]);
-			// }
-		}
-
-
+		// z.init(z.initdata);
 
 	}
 
@@ -146,43 +179,101 @@ var a ;
 $(function() {
 
 	$.get('TestDesign.html',function(html){
-		
+
 		var testdata = new Array();
 
 		for(i=0;i<10;i++){
-			testdata.push(html);
+			var jsondata = {
+				offset:parseInt(100*Math.random()),
+				html:html
+			}
+			testdata.push(jsondata);
 		}
 
+
 		a = new ReviewLib("#items");
-		console.log(a);
 		a.init(testdata);
-
-		a.element.bind('data',function(e,message){
-			console.log(message);
-				switch(message){
-					case "right":
-						var rightdata = new Array();
-						$.get('TestDesign.html',function(html){
-							for(i=0;i<5;i++){
-								rightdata.push(html);
-							}
-							a.BuildUI(rightdata,"right");
-						});
-						break;
-					case "left":
-						var rightdata = new Array();
-						$.get('TestDesign.html',function(html){
-							for(i=0;i<5;i++){
-								rightdata.push(html);
-							}
-							a.BuildUI(rightdata,"left");
-						});
-						break;
+		a.LoadItems = function(offset,direction){
+			var tdata;
+			$.ajax({
+				url:'TestDesign.html',
+				async:false,
+				success:function(data){
+					// console.log(data);
+					tdata = data;
 				}
+			});
+			var t = new Array();
+			for(i=0;i<5;i++){
+				var jsondata = {
+					offset:parseInt(100*Math.random()),
+					html:tdata
+				}
+				t.push(jsondata);
+			}
 
-		});
+			return t;
+		}
+
 
 	});
+
+
+
+
+
+	// $.get('TestDesign.html',function(html){
+		
+	// 	var testdata = new Array();
+
+	// 	for(i=0;i<10;i++){
+	// 		var jsondata = {
+	// 			offset:parseInt(100*Math.random()),
+	// 			html:html
+	// 		}
+	// 		testdata.push(jsondata);
+	// 	}
+
+	// 	a = new ReviewLib("#items");
+	// 	console.log(a);
+	// 	a.init(testdata);
+
+	// 	a.element.bind('reviewlibdata',function(e,message,offset){
+	// 		/* for test data*/
+
+	// 		console.log(message,offset);
+	// 			switch(message){
+	// 				case "right":
+	// 					var rightdata = new Array();
+	// 					$.get('TestDesign.html',function(html){
+	// 						for(i=0;i<5;i++){
+	// 							var jsondata = {
+	// 								offset:parseInt(100*Math.random()),
+	// 								html:html
+	// 							}
+	// 							rightdata.push(jsondata);
+	// 						}
+	// 						a.BuildUI(rightdata,"right");
+	// 					});
+	// 					break;
+	// 				case "left":
+	// 					var leftdata = new Array();
+	// 					$.get('TestDesign.html',function(html){
+	// 						for(i=0;i<5;i++){
+	// 							var jsondata = {
+	// 								offset:parseInt(100*Math.random()),
+	// 								html:html
+	// 							}
+	// 							leftdata.push(jsondata);
+	// 						}
+	// 						a.BuildUI(leftdata,"left");
+	// 					});
+	// 					break;
+	// 			}
+
+	// 	});
+
+	// });
 
 
 
