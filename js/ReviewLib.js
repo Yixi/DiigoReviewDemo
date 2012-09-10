@@ -20,9 +20,11 @@ var ReviewLib = function() {
 		
 
 		this.init = function(initdata) {
-			// console.log(initdata[0]);
-			z.BuildUI(initdata,"right");
-			// document.body.scrollLeft= 10000 * z.w;
+			if(initdata==undefined || initdata.length<1){
+				z.LoadItems(0,"right",z.BuildUI);
+			}else{
+				z.BuildUI(initdata,"right");
+			}
 		}
 
 		this.BuildUI = function(data, location) {
@@ -37,6 +39,7 @@ var ReviewLib = function() {
 					z.element.append('<div id="item_' + i + '" data-offset="'+data[i-z.r_offset].offset+'" class="item" style="height:' + z.h + 'px;width:' + z.w + 'px;overflow:hidden;float:left;position:relative;"></div>');
 					$("#item_" + i).append('<div id="i_' + i + '" class="i_item">' + data[i-z.r_offset].html + '</div>');
 					z.element.css("width",parseInt(a.element.css("width").slice(0,-2))+z.w);
+					$("#next_b").show();
 				}
 
 				if(z.element.children().length>25){
@@ -62,6 +65,7 @@ var ReviewLib = function() {
 					$("#item_" + i).append('<div id="i_' + i + '" class="i_item">' + data[data.length-z.l_offset+i-1].html + '</div>');
 					z.element.css("width",parseInt(a.element.css("width").slice(0,-2))+z.w);
 					z.element.css("marginLeft",parseInt(z.element.css('marginLeft').slice(0,-2))-z.w);
+					$("#prev_b").show();
 				}
 
 				if(z.element.children().length>25){
@@ -121,7 +125,13 @@ var ReviewLib = function() {
 
 		this.scrollLeft = function() {
 			
+			$("#next_b").show();
+			if(z.point==z.l_offset+1){
+				$("#prev_b").hide();
+			}	
+
 			if(z.point==z.l_offset){
+				$("#prev_b").hide();
 				return;
 			}			
 
@@ -148,8 +158,13 @@ var ReviewLib = function() {
 
 		this.scrollRight = function() {
 			
+			$("#prev_b").show();
 
 			if(z.point==z.r_offset-1){
+				$("#next_b").hide();
+			}
+
+			if(z.point==z.r_offset){
 				return;
 			}
 
@@ -174,110 +189,3 @@ var ReviewLib = function() {
 
 	}
 
-var a ;
-
-$(function() {
-
-	$.get('TestDesign.html',function(html){
-
-		var testdata = new Array();
-
-		for(i=0;i<10;i++){
-			var jsondata = {
-				offset:parseInt(100*Math.random()),
-				html:html
-			}
-			testdata.push(jsondata);
-		}
-
-
-		a = new ReviewLib("#items");
-		a.init(testdata);
-		a.LoadItems = function(offset,direction,callback){
-			$.ajax({
-				url:'TestDesign.html',
-				success:function(data){
-					// console.log(data);
-
-					var t = new Array();
-					for(i=0;i<5;i++){
-						var jsondata = {
-							offset:parseInt(100*Math.random()),
-							html:data
-						}
-						t.push(jsondata);
-					}
-
-					callback(t,direction)
-				}
-			});
-			
-
-		}
-
-
-	});
-
-
-
-
-
-	// $.get('TestDesign.html',function(html){
-		
-	// 	var testdata = new Array();
-
-	// 	for(i=0;i<10;i++){
-	// 		var jsondata = {
-	// 			offset:parseInt(100*Math.random()),
-	// 			html:html
-	// 		}
-	// 		testdata.push(jsondata);
-	// 	}
-
-	// 	a = new ReviewLib("#items");
-	// 	console.log(a);
-	// 	a.init(testdata);
-
-	// 	a.element.bind('reviewlibdata',function(e,message,offset){
-	// 		/* for test data*/
-
-	// 		console.log(message,offset);
-	// 			switch(message){
-	// 				case "right":
-	// 					var rightdata = new Array();
-	// 					$.get('TestDesign.html',function(html){
-	// 						for(i=0;i<5;i++){
-	// 							var jsondata = {
-	// 								offset:parseInt(100*Math.random()),
-	// 								html:html
-	// 							}
-	// 							rightdata.push(jsondata);
-	// 						}
-	// 						a.BuildUI(rightdata,"right");
-	// 					});
-	// 					break;
-	// 				case "left":
-	// 					var leftdata = new Array();
-	// 					$.get('TestDesign.html',function(html){
-	// 						for(i=0;i<5;i++){
-	// 							var jsondata = {
-	// 								offset:parseInt(100*Math.random()),
-	// 								html:html
-	// 							}
-	// 							leftdata.push(jsondata);
-	// 						}
-	// 						a.BuildUI(leftdata,"left");
-	// 					});
-	// 					break;
-	// 			}
-
-	// 	});
-
-	// });
-
-
-
-
-	
-
-});
